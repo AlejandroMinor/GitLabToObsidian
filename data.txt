@@ -3,3 +3,4 @@ token,token
 path,path
 issue_url,gitlab_url
 upload_url,default
+issue_list,default

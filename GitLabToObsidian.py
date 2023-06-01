@@ -14,7 +14,8 @@ class gitLabtoObsidian:
                 f.write(f"url,default \n")
                 f.write(f"token,default \n")
                 f.write(f"path,default \n")
-                f.write(f"issue_url,default\n")            
+                f.write(f"issue_url,default\n")
+                f.write(f"issue_list,default")             
         
         # Inicializar las variables
         self.url = ""
@@ -22,6 +23,7 @@ class gitLabtoObsidian:
         self.path = ""
         self.issue_url = ""
         self.upload_url = ""
+        self.issue_list = ""
 
         # Leer el archivo data.txt
         try:
@@ -38,6 +40,8 @@ class gitLabtoObsidian:
                         self.issue_url = parts[1].strip()
                     elif line.startswith('upload_url') and len(parts) == 2:
                         self.upload_url = parts[1].strip()
+                    elif line.startswith('issue_list') and len(parts) == 2:
+                        self.issue_list = parts[1].strip()
                         
         except FileNotFoundError:
             print("El archivo data.txt no se encuentra.")
@@ -84,13 +88,16 @@ class gitLabtoObsidian:
 
 
         # Definir parametros para el archivo
-        titulo_limpio = issue.title.replace("/", "").replace(":", "")
+        titulo_limpio = issue.title.replace("/", " ").replace(":", " ")
+        # Quitar doble espacio de la cadena de titulo_limpio
+        while "  " in titulo_limpio:
+            titulo_limpio = titulo_limpio.replace("  ", " ")
+        
         nombre_archivo = f"{numero_issue} {titulo_limpio}.md"
         fecha = date.today()
         descripcion = self.remove_markdown_formatting(issue.description)
         # Definir contenido del archivo
-        contenido = f"""
-## #{numero_issue}  {issue.title}
+        contenido = f"""## #{numero_issue}  {issue.title}
 [[Issue]]
 Asingado: 📅 [[{fecha}]]
 Estatus: [[🔄 En desarrollo]] |  📅 Fecha finalización
@@ -133,10 +140,11 @@ git commit -m "[CHANGE] Contexto programador" -m "Para analistas #NUMISSUE"
 
         # Escribir el archivo
         try:
-            directorio = os.path.dirname(ruta)
             with open(ruta, "w") as archivo:
                 archivo.write(contenido)
             print("Archivo escrito exitosamente en:", ruta)
+
+            self.add_to_issue_list("/home/minor/Documentos/Cerebro/👨‍💻 Issues/Issue.md", numero_issue+" "+titulo_limpio)
         except Exception as e:
             print("Error al escribir el archivo:", e)
 
@@ -162,6 +170,25 @@ git commit -m "[CHANGE] Contexto programador" -m "Para analistas #NUMISSUE"
         text = re.sub(r'/uploads/', rf'{self.upload_url}', text)
 
         return text
+    
+    def add_to_issue_list(self,archivo, texto):
+        with open(archivo, 'r+') as file:
+            lines = file.readlines()
+
+            # Buscar la última línea no vacía
+            for i in range(len(lines) - 1, -1, -1):
+                if lines[i].strip():
+                    last_line_index = i
+                    break
+
+            # Agregar el texto en la siguiente línea
+            texto = f"\n- [[{texto}]]"
+            lines.insert(last_line_index + 1, texto)
+
+            # Sobreescribir el archivo con las líneas modificadas
+            file.seek(0)
+            file.writelines(lines)
+            file.truncate()
 
 
 ## Inicializar la clase y crear el archivo
