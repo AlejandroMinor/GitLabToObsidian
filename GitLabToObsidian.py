@@ -106,7 +106,7 @@ URL GitLab: {self.issue_url}{numero_issue}
 
 {descripcion}
 
-#### Codigo para resolver
+#### Código para resolver
 
 
 Ruta ODOO:
@@ -125,15 +125,14 @@ Codigo
 #### Commit 
 
 ```shell
-git commit -m "[CHANGE] Contexto programador" -m "Para analistas #NUMISSUE"
+git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue} Contexto Para analistas"
 ```
 
 #### Comentarios
 - 1
 
 #### Analista: {issue.author['name']}
-
-        """
+"""
 
         # Definir la ruta del archivo
         ruta = self.path + nombre_archivo
