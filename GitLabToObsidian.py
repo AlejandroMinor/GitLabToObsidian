@@ -117,9 +117,9 @@ Ruta a programar : `ruta`
 
 A partir de la linea:  
 
-Codigo
+Código
 
-```Python
+```python
 ```
 
 #### Commit 
