@@ -20,27 +20,53 @@ class gitLabtoObsidian:
         self.issue_url = ""
         self.upload_url = ""
         self.issue_list = ""
+        self.project_id = ""
 
         # Leer el archivo config.txt
         self.load_settings(self.configuration_file)
 
-        self.create_file()
+        self.main_menu()
 
     def connect(self):
         # Configurar la conexión con GitLab
         try:
             self.gl = gitlab.Gitlab(self.url, private_token=self.token)
-        except:
-            print("Error al conectar con GitLab. Verifique los datos en el archivo config.txt")
+                    # Obtener información de un repositorio
+            project_id = self.project_id  # ID del repositorio en GitLab
+            self.repo = self.gl.projects.get(project_id)
+        except Exception as e:
+            print("Error al conectar con GitLab:", e)
+            print("\n Error al conectar con GitLab. Verifique los datos en el archivo config.txt \n")
+            self.show_data()
+            response = input("Desea crear un nuevo archivo de configuración? (s/n)")
+            if response.lower() == "s":
+                self.create_data(self.configuration_file)
+            else:
+                self.main_menu()
+
+
+    def main_menu(self):
+        print("\n\nSeleccione una opción:")
+        print("1. Crear archivo")
+        print("2. Configurar datos")
+        print("3. Ver datos")
+        print("0. Salir")
+        option = input("====> ")
+        if option == "1":
+            self.create_file()
+        elif option == "2":
             self.create_data(self.configuration_file)
+        elif option == "3":
+            self.show_data()
+            self.main_menu()
+        elif option == "0":
+            exit()
 
     def create_file(self):
 
         self.connect()
         
-        # Obtener información de un repositorio
-        project_id = 41  # ID del repositorio en GitLab
-        repo = self.gl.projects.get(project_id)
+        repo = self.repo
 
         print("\n\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         print("Nombre del repositorio:", repo.name)
@@ -159,20 +185,34 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
             file.writelines(lines)
             file.truncate()
 
-    def create_data(self,path_name):
+    def create_data(self, path_name):
+        field_defaults = {
+            "url": self.url,
+            "token": self.token,
+            "path": self.path,
+            "issue_url": self.issue_url,
+            "upload_url": self.upload_url,
+            "issue_list": self.issue_list,
+            "project_id": self.project_id,
+        }
+
         with open(path_name, 'w') as f:
-            url_default=input("Ingrese la url del repositorio: ")
-            token_default=input("Ingrese el token del repositorio: ")
-            path_default=input("Ingrese la ruta donde se creará el archivo: ")
-            issue_url_default=input("Ingrese la url para issues en gitlab: ")
-            issue_upload_url_default=input("Ingrese la url para subir archivos en gitlab: ")
-            issue_list_default=input("Ingrese la ruta del archivo donde se guardará la lista de issues: ")
-            f.write(f"url,{url_default} \n")
-            f.write(f"token,{token_default} \n")
-            f.write(f"path,{path_default} \n")
-            f.write(f"issue_url,{issue_url_default}\n")
-            f.write(f"upload_url,{issue_upload_url_default}\n")
-            f.write(f"issue_list,{issue_list_default}")
+            while True:
+                print("Ingrese los datos para configurar el programa. Deje el campo vacío para mantener el valor actual.")
+                for field, default_value in field_defaults.items():
+                    user_input = input(f"Ingrese {field.replace('_', ' ')} [{default_value}]: ")
+                    #value = user_input if user_input != "" else default_value
+                    if user_input != "":
+                        value = user_input
+                    else:
+                        value = default_value
+
+                    f.write(f"{field},{value}\n")
+
+                response = input("Datos correctos? (s/n): ")
+                if response.lower() == "s":
+                    break
+
         
     def load_settings(self,path_name):
         try:
@@ -191,10 +231,22 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
                         self.upload_url = parts[1].strip()
                     elif line.startswith('issue_list'):
                         self.issue_list = parts[1].strip()
-            print("Configuración cargada\n")
+                    elif line.startswith('project_id'):
+                        self.project_id = parts[1].strip()
+            print(f"Configuración cargada del archivo {path_name}")
                         
         except FileNotFoundError:
             print("El archivo config.txt no se encuentra.")
         except Exception as e:
             print("Error al leer el archivo config.txt:", str(e))
 
+    def show_data(self):
+        self.load_settings(self.configuration_file)
+        print("""\n Datos de configuración:""")
+        print("URL:", self.url)
+        print("Token:", self.token)
+        print("Path:", self.path)
+        print("Issue URL:", self.issue_url)
+        print("Upload URL:", self.upload_url)
+        print("Issue List:", self.issue_list)
+        print("Project ID:", self.project_id)
