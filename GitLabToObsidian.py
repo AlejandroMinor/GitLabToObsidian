@@ -8,14 +8,10 @@ class gitLabtoObsidian:
     def __init__(self):
         
         # Verificar si existe el archivo data.txt
-        if not os.path.exists('data.txt'):
+        path_name= 'data.txt'
+        if not os.path.exists(path_name):
             print("No existe el archivo de configuración data.txt. Se crearán los datos por defecto")
-            with open('data.txt', 'w') as f:
-                f.write(f"url,default \n")
-                f.write(f"token,default \n")
-                f.write(f"path,default \n")
-                f.write(f"issue_url,default\n")
-                f.write(f"issue_list,default")             
+            self.create_data(path_name)        
         
         # Inicializar las variables
         self.url = ""
@@ -26,31 +22,11 @@ class gitLabtoObsidian:
         self.issue_list = ""
 
         # Leer el archivo data.txt
-        try:
-            with open('data.txt', 'r') as f:
-                for line in f:
-                    parts = line.split(',')
-                    if line.startswith('url') and len(parts) == 2:
-                        self.url = parts[1].strip()
-                    elif line.startswith('token') and len(parts) == 2:
-                        self.token = parts[1].strip()
-                    elif line.startswith('path') and len(parts) == 2:
-                        self.path = parts[1].strip()
-                    elif line.startswith('issue_url') and len(parts) == 2:
-                        self.issue_url = parts[1].strip()
-                    elif line.startswith('upload_url') and len(parts) == 2:
-                        self.upload_url = parts[1].strip()
-                    elif line.startswith('issue_list') and len(parts) == 2:
-                        self.issue_list = parts[1].strip()
-                        
-        except FileNotFoundError:
-            print("El archivo data.txt no se encuentra.")
-        except Exception as e:
-            print("Error al leer el archivo data.txt:", str(e))
+        self.load_settings(path_name)
 
-        self.createFile()
+        self.create_file()
 
-    def createFile(self):
+    def create_file(self):
         # Configurar la conexión con GitLab
         gl = gitlab.Gitlab(self.url, private_token=self.token)
 
@@ -148,25 +124,14 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
             print("Error al escribir el archivo:", e)
 
 
-
     def remove_markdown_formatting(self,text):
-        # Remover los enlaces en formato [texto](url)
-        #text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
-        
-        # Remover los énfasis en formato *texto* o _texto_
-        #text = re.sub(r'(\*|_)(.*?)\1', r'\2', text)
         
         # Remover los encabezados en formato # Encabezado
         text = re.sub(r'#+\s+(.*?)\s*(?:\n|$)', r'\1', text)
-        
-        # Remover las listas en formato * elemento o 1. elemento
-        #text = re.sub(r'^\s*([\*\-]|(?:\d+\.))\s+', '', text, flags=re.MULTILINE)
-        
-        # Remover las líneas horizontales en formato --- o ***
-        #text = re.sub(r'^\s*[-*_]{3,}\s*$', '', text, flags=re.MULTILINE)
-        
+                
         # cambiar la palabra /uploads/ por la url del servidor de carga de archivos
-        text = re.sub(r'/uploads/', rf'{self.upload_url}', text)
+        text = text.replace('/uploads/', self.upload_url)
+
 
         return text
     
@@ -189,6 +154,36 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
             file.writelines(lines)
             file.truncate()
 
+    def create_date(self,path_name):
+        with open(path_name, 'w') as f:
+            f.write("url,default \n")
+            f.write("token,default \n")
+            f.write("path,default \n")
+            f.write("issue_url,default\n")
+            f.write("issue_list,default") 
+    
+    def load_settings(self,path_name):
+        try:
+            with open(path_name, 'r') as f:
+                for line in f:
+                    parts = line.split(',')
+                    if line.startswith('url') and len(parts) == 2:
+                        self.url = parts[1].strip()
+                    elif line.startswith('token') and len(parts) == 2:
+                        self.token = parts[1].strip()
+                    elif line.startswith('path') and len(parts) == 2:
+                        self.path = parts[1].strip()
+                    elif line.startswith('issue_url') and len(parts) == 2:
+                        self.issue_url = parts[1].strip()
+                    elif line.startswith('upload_url') and len(parts) == 2:
+                        self.upload_url = parts[1].strip()
+                    elif line.startswith('issue_list') and len(parts) == 2:
+                        self.issue_list = parts[1].strip()
+                        
+        except FileNotFoundError:
+            print("El archivo data.txt no se encuentra.")
+        except Exception as e:
+            print("Error al leer el archivo data.txt:", str(e))
 
 ## Inicializar la clase y crear el archivo
 init = gitLabtoObsidian
