@@ -153,14 +153,21 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
             file.writelines(lines)
             file.truncate()
 
-    def create_date(self,path_name):
+    def create_data(self,path_name):
         with open(path_name, 'w') as f:
-            f.write("url,default \n")
-            f.write("token,default \n")
-            f.write("path,default \n")
-            f.write("issue_url,default\n")
-            f.write("issue_list,default") 
-    
+            url_default=input("Ingrese la url del repositorio: ")
+            token_default=input("Ingrese el token del repositorio: ")
+            path_default=input("Ingrese la ruta donde se creará el archivo: ")
+            issue_url_default=input("Ingrese la url para issues en gitlab: ")
+            issue_upload_url_default=input("Ingrese la url para subir archivos en gitlab: ")
+            issue_list_default=input("Ingrese la ruta del archivo donde se guardará la lista de issues: ")
+            f.write(f"url,{url_default} \n")
+            f.write(f"token,{token_default} \n")
+            f.write(f"path,{path_default} \n")
+            f.write(f"issue_url,{issue_url_default}\n")
+            f.write(f"upload_url,{issue_upload_url_default}\n")
+            f.write(f"issue_list,{issue_list_default}")
+        
     def load_settings(self,path_name):
         try:
             with open(path_name, 'r') as f:
