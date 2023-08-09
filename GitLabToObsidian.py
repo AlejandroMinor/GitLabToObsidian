@@ -123,7 +123,6 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
         except Exception as e:
             print("Error al escribir el archivo:", e)
 
-
     def remove_markdown_formatting(self,text):
         
         # Remover los encabezados en formato # Encabezado
@@ -184,7 +183,3 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
             print("El archivo data.txt no se encuentra.")
         except Exception as e:
             print("Error al leer el archivo data.txt:", str(e))
-
-## Inicializar la clase y crear el archivo
-init = gitLabtoObsidian
-init()
