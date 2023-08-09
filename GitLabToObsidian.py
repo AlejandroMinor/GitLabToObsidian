@@ -7,11 +7,11 @@ class gitLabtoObsidian:
     ## Constructor
     def __init__(self):
         
-        # Verificar si existe el archivo data.txt
-        path_name= 'data.txt'
-        if not os.path.exists(path_name):
-            print("No existe el archivo de configuración data.txt. Se crearán los datos por defecto")
-            self.create_data(path_name)        
+        # Verificar si existe el archivo config.txt
+        self.configuration_file = 'config.txt'
+        if not os.path.exists(self.configuration_file):
+            print("No existe el archivo de configuración config.txt. Se crearán los datos por defecto")
+            self.create_data(self.configuration_file)        
         
         # Inicializar las variables
         self.url = ""
@@ -21,18 +21,26 @@ class gitLabtoObsidian:
         self.upload_url = ""
         self.issue_list = ""
 
-        # Leer el archivo data.txt
-        self.load_settings(path_name)
+        # Leer el archivo config.txt
+        self.load_settings(self.configuration_file)
 
         self.create_file()
 
-    def create_file(self):
+    def connect(self):
         # Configurar la conexión con GitLab
-        gl = gitlab.Gitlab(self.url, private_token=self.token)
+        try:
+            self.gl = gitlab.Gitlab(self.url, private_token=self.token)
+        except:
+            print("Error al conectar con GitLab. Verifique los datos en el archivo config.txt")
+            self.create_data(self.configuration_file)
 
+    def create_file(self):
+
+        self.connect()
+        
         # Obtener información de un repositorio
         project_id = 41  # ID del repositorio en GitLab
-        repo = gl.projects.get(project_id)
+        repo = self.gl.projects.get(project_id)
 
         print("\n\nxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
         print("Nombre del repositorio:", repo.name)
@@ -44,8 +52,6 @@ class gitLabtoObsidian:
 
         try:
             issue = repo.issues.get(numero_issue)
-            users = issue.participants()
-
             print("Información del issue:")
             print("Título:", issue.title)
             print("Descripción:", issue.description)
@@ -173,20 +179,22 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
             with open(path_name, 'r') as f:
                 for line in f:
                     parts = line.split(',')
-                    if line.startswith('url') and len(parts) == 2:
+                    if line.startswith('url'):
                         self.url = parts[1].strip()
-                    elif line.startswith('token') and len(parts) == 2:
+                    elif line.startswith('token'):
                         self.token = parts[1].strip()
-                    elif line.startswith('path') and len(parts) == 2:
+                    elif line.startswith('path'):
                         self.path = parts[1].strip()
-                    elif line.startswith('issue_url') and len(parts) == 2:
+                    elif line.startswith('issue_url'):
                         self.issue_url = parts[1].strip()
-                    elif line.startswith('upload_url') and len(parts) == 2:
+                    elif line.startswith('upload_url'):
                         self.upload_url = parts[1].strip()
-                    elif line.startswith('issue_list') and len(parts) == 2:
+                    elif line.startswith('issue_list'):
                         self.issue_list = parts[1].strip()
+            print("Configuración cargada\n")
                         
         except FileNotFoundError:
-            print("El archivo data.txt no se encuentra.")
+            print("El archivo config.txt no se encuentra.")
         except Exception as e:
-            print("Error al leer el archivo data.txt:", str(e))
+            print("Error al leer el archivo config.txt:", str(e))
+
