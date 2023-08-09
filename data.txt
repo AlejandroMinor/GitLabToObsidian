@@ -1,6 +1,0 @@
-url,default 
-token,default
-path,default
-issue_url,default
-upload_url,default
-issue_list,default
