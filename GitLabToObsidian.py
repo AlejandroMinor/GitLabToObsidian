@@ -7,12 +7,6 @@ class gitLabtoObsidian:
     ## Constructor
     def __init__(self):
         
-        # Verificar si existe el archivo config.txt
-        self.configuration_file = 'config.txt'
-        if not os.path.exists(self.configuration_file):
-            print("No existe el archivo de configuración config.txt. Se crearán los datos por defecto")
-            self.create_data(self.configuration_file)        
-        
         # Inicializar las variables
         self.url = ""
         self.token = ""
@@ -21,6 +15,12 @@ class gitLabtoObsidian:
         self.upload_url = ""
         self.issue_list = ""
         self.project_id = ""
+
+        # Verificar si existe el archivo config.txt
+        self.configuration_file = 'config.txt'
+        if not os.path.exists(self.configuration_file):
+            print("No existe el archivo de configuración config.txt. Se crearán los datos por defecto")
+            self.create_data(self.configuration_file)        
 
         # Leer el archivo config.txt
         self.load_settings(self.configuration_file)
@@ -151,7 +151,7 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
                 archivo.write(contenido)
             print("Archivo escrito exitosamente en:", ruta)
 
-            self.add_to_issue_list("/home/minor/Documentos/Cerebro/👨‍💻 Issues/Issue.md", numero_issue+" "+titulo_limpio)
+            self.add_to_issue_list(self.issue_list, numero_issue+" "+titulo_limpio)
         except Exception as e:
             print("Error al escribir el archivo:", e)
 
