@@ -107,7 +107,7 @@ class gitLabtoObsidian:
         # Definir contenido del archivo
         contenido = f"""## #{numero_issue}  {issue.title}
 [[Issue]]
-Asingado: 📅 [[{fecha}]]
+Asignado: 📅 [[{fecha}]]
 Estatus: [[🔄 En desarrollo]] |  📅 Fecha finalización
 URL GitLab: {self.issue_url}{numero_issue}
 #### Información 
@@ -117,18 +117,6 @@ URL GitLab: {self.issue_url}{numero_issue}
 #### Código para resolver
 
 
-Ruta ODOO:
-
-
-Ruta a programar : `ruta`
-
-
-A partir de la linea:  
-
-Código
-
-```python
-```
 
 #### Commit 
 
