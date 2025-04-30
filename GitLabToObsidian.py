@@ -3,7 +3,7 @@ import os
 from datetime import date
 import re
 
-class gitLabtoObsidian:
+class GitLabtoObsidian:
     ## Constructor
     def __init__(self):
         
@@ -105,24 +105,28 @@ class gitLabtoObsidian:
         fecha = date.today()
         descripcion = self.remove_markdown_formatting(issue.description)
         # Definir contenido del archivo
-        contenido = f"""## #{numero_issue}  {issue.title}
-[[Issue]]
-Asignado: 📅 [[{fecha}]]
-Estatus: [[🔄 En desarrollo]] |  📅 Fecha finalización
-URL GitLab: {self.issue_url}{numero_issue}
+        contenido = f"""---
+Tipo: "[[Issue]]"
+Asignado: "[[{fecha}]]"
+Estatus: "[[🔄 En desarrollo]]"
+Terminado: "[[YYYY-MM-DD]]"
+Modulos:
+  - 
+Entorno: Local
+URLGitLab: {self.issue_url}{numero_issue}
+MergeRequest:
+  -
+CambiosDocumentados:
+  -
+---
+## #{numero_issue}  {issue.title}
+
 #### Información 
 
 {descripcion}
 
 #### Código para resolver
 
-
-
-#### Commit 
-
-```shell
-git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue} Contexto Para analistas"
-```
 
 #### Comentarios
 - 1
@@ -189,7 +193,6 @@ git commit -m "[CHANGE] #{numero_issue} Contexto programador" -m "#{numero_issue
                 print("Ingrese los datos para configurar el programa. Deje el campo vacío para mantener el valor actual.")
                 for field, default_value in field_defaults.items():
                     user_input = input(f"Ingrese {field.replace('_', ' ')} [{default_value}]: ")
-                    #value = user_input if user_input != "" else default_value
                     if user_input != "":
                         value = user_input
                     else:
