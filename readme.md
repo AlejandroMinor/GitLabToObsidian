@@ -25,8 +25,17 @@ El script utiliza la biblioteca `python-gitlab` para interactuar con la API de G
 pip install python-gitlab
 ```
 
-3. Configura los datos de conexión en el archivo `data.txt`. Sigue el formato indicado en el archivo para especificar la URL, el token de acceso, la ruta de almacenamiento y otros parámetros relevantes.
-
+3. Configura los datos de conexión en el archivo `config.txt`.
+Ejemplo:
+```
+url,http://192.168.29.74:8091
+token,glTESTcM7
+path,/home/minor/Documentos/Minor/👨‍💻 Issues/
+issue_url,http://URL/-/issues/
+upload_url,http://URL/uploads/
+issue_list,/home/minor/Documentos/Minor/👨‍💻 Issues/Issue.md
+project_id,41
+```
 
 ## Tutorial
 
